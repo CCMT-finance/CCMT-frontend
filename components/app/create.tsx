@@ -19,9 +19,11 @@ import {MetamaskError} from "./metamask-error";
 import {logoUrl} from "../tools/tools";
 import {useRouter} from "next/router";
 import {submitOrder} from "../tools/1inch";
-import {usePropositions} from "../providers/propositions-provider";
+import {Proposition, usePropositions} from "../providers/propositions-provider";
 import {CCMTProvider} from "../tools/abis/CCMTProvider";
 import Web3 from "web3";
+import {config} from "../config/config";
+import Error from "next/error";
 
 const Root = styled(Container)`
   display: flex;
@@ -66,11 +68,8 @@ const addressToBytes = (web3: Web3, address: string) => web3.utils.hexToBytes(we
 const bytesToAddress = (web3: Web3, bytes: number[]) => "0x" + web3.utils.bytesToHex(bytes).slice(26)
 
 export const Create: React.FC = () => {
-    const {web3, netId, isError, web3Account} = useWeb3()
+    const {web3, netId, isError, web3Account, isAdmin} = useWeb3()
     const {requestReload} = usePropositions()
-
-    if (isError || !web3)
-        return <MetamaskError/>
 
     const [tokens, setTokens] = useState([] as Token[]);
     const [selectedFromTokenIndex, setSelectedFromTokenIndex] = useState(0);
@@ -83,31 +82,52 @@ export const Create: React.FC = () => {
 
     const post = useCallback(() => {
             (async () => {
+                if (!web3)
+                    return
+
                 const selectedFromToken = tokens[selectedFromTokenIndex]
                 const selectedToToken = tokens[selectedToTokenIndex]
 
                 // SHIT below
-                console.log(selectedFromToken.address)
-                const bytes32 = addressToBytes(web3, selectedFromToken.address)
-                console.log(bytes32)
-                const ret = bytesToAddress(web3, bytes32)
-                console.log(ret)
+                // console.log(selectedFromToken.address)
+                // const bytes32 = addressToBytes(web3, selectedFromToken.address)
+                // console.log(bytes32)
+                // const ret = bytesToAddress(web3, bytes32)
+                // console.log(ret)
+                //
+                // web3.eth.abi.encodeParameter('bytes32', selectedFromToken.address)
 
-                const CCMTProviderAddress = "0x02de38b5a684891e982de5179e32c99bdf8f969d"
-                const provider = new web3.eth.Contract(CCMTProvider, CCMTProviderAddress)
-                const nftToken = await provider.methods.ccmtToken().send({from: web3Account});
+                const provider = new web3.eth.Contract(CCMTProvider, config.CCMTProviderAddress)
+                const nftToken = await provider.methods.ccmtToken().call();
+                const nftUniqId = Math.floor(Math.random() * 9999999).toString();
+
+                const orderData = {
+                    netId: netId,
+                    limitOrderContractAddress: config.limitOrderAddress,
+                    makerAddress: config.CCMTProviderAddress, // Our CCMTProvider in Kovan
+                    makerAssetAddress: nftToken,
+                    takerAssetAddress: selectedFromToken.address,
+                    makerAmount: nftUniqId, // In erc721, amount is id
+                    takerAmount: web3.utils.toWei(fromAmount),
+                    tradeToAddress: selectedToToken.address,
+                    margin: Number(coefficient),
+                    nftUniqId: nftUniqId,
+                    toSymbol: selectedToToken.symbol,
+                    fromSymbol: selectedFromToken.symbol,
+                    id: -1,
+                } as Omit<Proposition, "orderStructs">
 
                 const orderStructs = await submitOrder(
                     web3,
-                    netId,
-                    "0x94Bc2a1C732BcAd7343B25af48385Fe76E08734f", // LimitOrderProtocol in Kovan
-                    CCMTProviderAddress, // Our CCMTProvider in Kovan
-                    nftToken,
-                    selectedFromToken.address,
-                    "1", // Give only ONE nft
-                    web3.utils.toWei(fromAmount),
-                    selectedToToken.address,
-                    Number(coefficient)
+                    orderData.netId,
+                    orderData.limitOrderContractAddress,
+                    orderData.makerAddress,
+                    orderData.makerAssetAddress,
+                    orderData.takerAssetAddress,
+                    orderData.makerAmount,
+                    orderData.takerAmount,
+                    orderData.tradeToAddress,
+                    orderData.margin,
                 )
 
                 await fetch("/api/add", {
@@ -116,13 +136,7 @@ export const Create: React.FC = () => {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        fromAddress: selectedFromToken.address,
-                        fromAmount: web3.utils.toWei(fromAmount),
-                        fromSymbol: selectedFromToken.symbol,
-                        bankAddress: web3Account,
-                        toAddress: selectedToToken.address,
-                        toSymbol: selectedToToken.symbol,
-                        coefficient: Number(coefficient),
+                        ...orderData,
                         orderStructs
                     })
                 })
@@ -130,7 +144,7 @@ export const Create: React.FC = () => {
                 await router.push("/")
             })()
         },
-        [tokens, selectedFromTokenIndex, setSelectedToTokenIndex, fromAmount, coefficient, router],
+        [web3, tokens, selectedFromTokenIndex, setSelectedToTokenIndex, fromAmount, coefficient, router],
     );
 
 
@@ -150,6 +164,13 @@ export const Create: React.FC = () => {
             }])
         })()
     }, []);
+
+
+    if (isError || !web3)
+        return <MetamaskError/>
+
+    if (!isAdmin)
+        return <Error statusCode={404}/>
 
     if (tokens.length === 0)
         return <Root maxWidth={"md"}>

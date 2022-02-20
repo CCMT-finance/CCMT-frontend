@@ -9,8 +9,14 @@
     "build": "next build",
     "start": "node server.js"
   },
+  "dependencies": {
+    "body-parser": "^1.19.2",
+    "express": "^4.17.3",
+    "lowdb": "^3.0.0",
+    "next": "12.1.0"
+  },
   "devDependencies": {
-    "@1inch/limit-order-protocol": "2.0.3",
+    "@1inch/limit-order-protocol": "^1.2.1",
     "@emotion/react": "^11.8.0",
     "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.8.0",
@@ -20,10 +26,6 @@
     "@types/express": "^4.17.13",
     "@types/react-dom": "17.0.11",
     "@types/styled-components": "5.1.23",
-    "body-parser": "^1.19.2",
-    "express": "^4.17.3",
-    "lowdb": "^3.0.0",
-    "next": "12.1.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-redux": "7.2.6",

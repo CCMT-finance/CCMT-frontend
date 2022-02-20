@@ -1,25 +1,40 @@
-import { createTheme } from '@mui/material/styles';
-import { red } from '@mui/material/colors';
+import {createTheme} from '@mui/material/styles';
+import {red} from '@mui/material/colors';
 
 // Create a theme instance.
 export const theme = createTheme({
     palette: {
         primary: {
-            main: '#556cd6',
+            main: '#272635',
         },
         secondary: {
-            main: '#19857b',
+            main: '#B1E5F2',
         },
         error: {
-            main: red.A400,
+            main: "#e8006f",
         },
+        background: {
+            default: "#E8E9F3",
+            paper: "#ffffff"
+        }
     },
     components: {
         MuiPaper: {
             styleOverrides: {
                 root: {
                     borderRadius: 24,
-                    padding: 12
+                    padding: 16,
+                    boxShadow: "none"
+                }
+            }
+        },
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 24,
+                    padding: 10,
+                    boxShadow: "none",
+                    textTransform: "none"
                 }
             }
         }

@@ -2,6 +2,8 @@ import * as React from "react";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import Web3 from "web3";
 import {createProvider} from "../tools/react-provider";
+import {CCMTProvider} from "../tools/abis/CCMTProvider";
+import {config} from "../config/config";
 
 const NO_METAMASK_ERROR = "NoMetamaskError";
 const LOCKED_METAMASK_ERROR = "LockedMetamaskError";
@@ -59,6 +61,7 @@ const web3Provider = createProvider(() => {
     const [web3State, setWeb3State] = useState(Web3State.REQUESTED);
     const [web3Account, setWeb3Account] = useState("");
     const [netId, setNetId] = useState(-1);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const reset = useCallback(
         () => {
@@ -87,13 +90,21 @@ const web3Provider = createProvider(() => {
                     if (netId != 42) {
                         setWeb3State(Web3State.BAD_NETWORK)
                     } else {
+                        const provider = new web3.eth.Contract(CCMTProvider, config.CCMTProviderAddress)
+                        const owner = await provider.methods.owner().call();
+
                         setWeb3(web3)
                         setWeb3Account(accounts[0])
                         setNetId(netId)
+                        setIsAdmin(accounts[0] === owner)
                         setWeb3State(Web3State.CONNECTED)
 
                         // @ts-ignore
                         if (window.ethereum) {
+                            // @ts-ignore
+                            window.ethereum.on('accountsChanged', async () => {
+                                reset()
+                            });
                             // @ts-ignore
                             window.ethereum.on('chainChanged', async () => {
                                 reset()
@@ -129,7 +140,7 @@ const web3Provider = createProvider(() => {
         web3State, setWeb3State,
         web3Account, setWeb3Account,
         netId, setNetId,
-        reset, isError
+        reset, isError, isAdmin
     }
 })
 

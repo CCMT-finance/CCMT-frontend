@@ -3,29 +3,20 @@ import {AbiItem} from "web3-utils";
 // @ts-ignore
 export const CCMTProvider = [
     {
-        "anonymous": false,
         "inputs": [
             {
-                "indexed": true,
                 "internalType": "address",
-                "name": "owner",
+                "name": "_limitOrderProtocol",
                 "type": "address"
             },
             {
-                "indexed": true,
                 "internalType": "address",
-                "name": "spender",
+                "name": "_feeManager",
                 "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "value",
-                "type": "uint256"
             }
         ],
-        "name": "Approval",
-        "type": "event"
+        "stateMutability": "nonpayable",
+        "type": "constructor"
     },
     {
         "anonymous": false,
@@ -33,34 +24,67 @@ export const CCMTProvider = [
             {
                 "indexed": true,
                 "internalType": "address",
-                "name": "from",
+                "name": "previousOwner",
                 "type": "address"
             },
             {
                 "indexed": true,
                 "internalType": "address",
-                "name": "to",
+                "name": "newOwner",
                 "type": "address"
-            },
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "value",
+                "name": "uniq_id",
                 "type": "uint256"
             }
         ],
-        "name": "Transfer",
+        "name": "TradeClosed",
         "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "uniq_id",
+                "type": "uint256"
+            }
+        ],
+        "name": "TradeCreated",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "LIMIT_ORDER_TYPEHASH",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
         "inputs": [
             {
                 "internalType": "address",
-                "name": "who",
+                "name": "token",
                 "type": "address"
             }
         ],
-        "name": "balanceOf",
+        "name": "balance",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -73,11 +97,261 @@ export const CCMTProvider = [
     },
     {
         "inputs": [],
-        "name": "totalSupply",
+        "name": "ccmtToken",
         "outputs": [
+            {
+                "internalType": "contract CCMTToken",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "uniq_id",
+                "type": "uint256"
+            }
+        ],
+        "name": "closeTrade",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "feeManager",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "uniq_id",
+                "type": "uint256"
+            }
+        ],
+        "name": "getTradeInfo",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "bool",
+                        "name": "isActive",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "fromAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "toAsset",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "deposited",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "depositedWithMargin",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "firstPrice",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "createdTimestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct CCMTTrade.Trade",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "hash",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes",
+                "name": "signature",
+                "type": "bytes"
+            }
+        ],
+        "name": "isValidSignature",
+        "outputs": [
+            {
+                "internalType": "bytes4",
+                "name": "",
+                "type": "bytes4"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "limitOrderProtocol",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "makerAsset",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "takerAsset",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "makingAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "takingAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "interactiveData",
+                "type": "bytes"
+            }
+        ],
+        "name": "notifyFillOrder",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "requestAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "fromAsset",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "toAsset",
+                "type": "address"
+            }
+        ],
+        "name": "requestTokenAmountOrRevert",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
             {
                 "internalType": "uint256",
                 "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "trades",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "isActive",
+                "type": "bool"
+            },
+            {
+                "internalType": "address",
+                "name": "fromAsset",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "toAsset",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "deposited",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "depositedWithMargin",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "firstPrice",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "createdTimestamp",
                 "type": "uint256"
             }
         ],
@@ -88,100 +362,12 @@ export const CCMTProvider = [
         "inputs": [
             {
                 "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "value",
-                "type": "uint256"
-            }
-        ],
-        "name": "transfer",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "spender",
+                "name": "newOwner",
                 "type": "address"
             }
         ],
-        "name": "allowance",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "value",
-                "type": "uint256"
-            }
-        ],
-        "name": "transferFrom",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "spender",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "value",
-                "type": "uint256"
-            }
-        ],
-        "name": "approve",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
+        "name": "transferOwnership",
+        "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     }

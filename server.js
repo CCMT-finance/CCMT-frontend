@@ -2,7 +2,7 @@
 import next from "next";
 import express from "express";
 import {JSONFile, Low} from 'lowdb'
-import cors from "cors";
+// import cors from "cors";
 import path from "path";
 import bodyParser from "body-parser";
 
@@ -19,7 +19,7 @@ import bodyParser from "body-parser";
     db.data ||= {propositions: []}
 
     const app = express()
-    app.use(cors())
+    // app.use(cors())
     app.use(bodyParser.json())
 
     // https://github.com/trustwallet/assets/raw/master/blockchains/ethereum/assets/0x0000000000085d4780B73119b644AE5ecd22b376/logo.png
@@ -30,7 +30,7 @@ import bodyParser from "body-parser";
     apiRouter.put("/add", async (req, res) => {
         try {
             const data = req.body
-            db.data.propositions.push(data)
+            db.data.propositions.push({...data, id: db.data.propositions.length})
             await db.write()
             res.send("OK")
         } catch (e) {
@@ -41,7 +41,26 @@ import bodyParser from "body-parser";
     apiRouter.delete("/remove", async (req, res) => {
         try {
             const data = req.body
-            db.data.propositions.splice(data.index, 1)
+            db.data.propositions.splice(data.id, 1)
+            await db.write()
+            res.send("OK")
+        } catch (e) {
+            console.error(e)
+            res.sendStatus(500)
+        }
+    })
+    apiRouter.post("/setdata", async (req, res) => {
+        try {
+            const data = req.body
+            const proposition = db.data.propositions.find(proposition => proposition.id === data.id)
+            db.data.propositions = [
+                ...db.data.propositions.filter(proposition => proposition.id !== data.id),
+                {
+                    ...proposition,
+                    ...data,
+                    id: proposition.id
+                }
+            ].sort((a,b) => a.id - b.id)
             await db.write()
             res.send("OK")
         } catch (e) {

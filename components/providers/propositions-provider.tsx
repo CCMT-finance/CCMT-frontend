@@ -4,14 +4,30 @@ import {createProvider} from "../tools/react-provider";
 import {useWeb3, Web3State} from "./web3-provider";
 
 export type Proposition = {
-    fromAddress: string,
-    fromAmount: string,
+    id: number,
+    netId: number,
+    limitOrderContractAddress: string,
+    makerAddress: string
+    makerAssetAddress: string,
+    takerAssetAddress: string,
+    makerAmount: string,
+    takerAmount: string,
+    tradeToAddress: string,
+    margin: number,
+    nftUniqId: string
+    orderStructs: any,
     fromSymbol: string,
-    toAddress: string,
     toSymbol: string,
-    bankAddress: string,
-    coefficient: number,
-    orderStructs: any
+    tradeInfo?: {
+        nftOwner: string,
+        isActive: boolean,
+        fromAsset: string,
+        toAsset: string,
+        deposited: string,
+        depositedWithMargin: string,
+        firstPrice: string,
+        createdTimestamp: string
+    }
 }
 
 const propositionsProvider = createProvider(() => {

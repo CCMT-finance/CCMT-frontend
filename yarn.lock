@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@1inch/limit-order-protocol@2.0.3":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@1inch/limit-order-protocol/-/limit-order-protocol-2.0.3.tgz#79e126f27db77cd4569938e24a96158054e67f72"
-  integrity sha512-rbED62yrAhVCoM0cGyM9Hy/nUtVaR84QhItWoLa8sweK6cFAc+yQwjPjDPvt6iVVCzudgPU18N1i8f6YAdWxnw==
+"@1inch/limit-order-protocol@^1.2.1":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@1inch/limit-order-protocol/-/limit-order-protocol-1.5.0.tgz#92baeddc845b6d39b770e404218c88995392e65b"
+  integrity sha512-n2gYaNZnDgIoPQ3H1/RUjER5u/bOnjQT+xCTke8GA6KjMGXI6MFDlP/7yzPF/E4u/TxM1DA8has7CCgo18sIfA==
   dependencies:
     "@ethersproject/bignumber" "^5.1.1"
     eth-sig-util "^3.0.1"

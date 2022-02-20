@@ -1,35 +1,12 @@
 import {LimitOrderBuilder, Web3ProviderConnector} from '@1inch/limit-order-protocol';
 import {limitOrderProtocolAbi} from "./abis/LimitOrderProtocol";
-
 import {erc20Abi} from "./abis/ERC20";
 import Web3 from "web3";
-import {jsx} from "@emotion/react";
-
-
-const limitOrderAddresses = {
-    1: "",
-    3: "",
-    4: "",
-    5: "",
-    42: "0x94Bc2a1C732BcAd7343B25af48385Fe76E08734f"
-}
-
-const makerAddresses = {
-    1: "",
-    3: "",
-    4: "",
-    5: "",
-    42: "0xA916DCFf98E05D593DFC526d928718fDD3831c52"
-}
-
-
-export const backendAddress = "http://185.241.53.33:3001"
 
 
 export const submitOrder = async (
     web3: Web3,
     netId: number,
-
     limitOrderContractAddress: string,
     makerAddress: string,
     makerAssetAddress: string,
@@ -58,38 +35,17 @@ export const submitOrder = async (
         takerAmount: takerAmount,
         predicate: '0x',
         permit: '0x',
-        interaction: web3.eth.abi.encodeParameters(
-            ['address', 'uint256'], [tradeToAddress, margin]
-        )
+        interaction: web3.eth.abi.encodeParameter('bytes32', tradeToAddress + web3.utils.numberToHex(margin).slice(2)),
     }
 
-    // const newNotEncodedHash = web3.utils.keccak256(JSON.stringify({
-    //     ...limitOrderStruct,
-    //     random: Math.random()
-    // }))
+    const limitOrder = limitOrderBuilder.buildLimitOrder(limitOrderStruct);
 
-    // const newHashEncoded = web3.eth.abi.encodeParameter("bytes32", newNotEncodedHash)
-    // const newLimitOrder = {...limitOrderStruct, interaction: newNotEncodedHash}
-
-    const newLimitOrder = limitOrderStruct
-
-    const limitOrder = limitOrderBuilder.buildLimitOrder(newLimitOrder);
+    limitOrder.getMakerAmount = '0x';
+    limitOrder.getTakerAmount = '0x';
 
     return {
         limitOrder,
-        limitOrderStruct: newLimitOrder
     }
-    // await fetch(backendAddress + "/create?" + "data=" + JSON.stringify({
-    //     limitOrder,
-    //     limitOrderStruct: newLimitOrder
-    // }))
-
-    // to backend
-    // const makerAssetContract = new web3.eth.Contract(erc20Abi, makerAssetAddress)
-    // await (makerAssetContract.methods.approve(makerAddress, makerAmount)).send({from: walletAddress});
-    //
-    // const ppContract = new web3.eth.Contract(ppContractAbi, makerAddress);
-    // await ppContract.methods.createOrder(newNotEncodedHash, makerAssetAddress, makerAmount).send({from: walletAddress});
 }
 
 const orderExample = {
@@ -118,7 +74,7 @@ const orderExample = {
 }
 
 
-type Order = typeof orderExample
+export type Order = typeof orderExample
 
 const OrderSol = [
     {name: 'salt', type: 'uint256'},
@@ -133,7 +89,7 @@ const OrderSol = [
     {name: 'interaction', type: 'bytes'},
 ];
 
-const ABIOrder = {
+export const ABIOrder = {
     'Order': OrderSol.reduce((obj: { [key: string]: string }, item) => {
         obj[item.name] = item.type;
         return obj;
