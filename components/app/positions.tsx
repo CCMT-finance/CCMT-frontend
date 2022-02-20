@@ -45,12 +45,13 @@ const PositionCard: React.FC<{ className?: string, proposition: Proposition }> =
 
                 const formattedTradeInfo = {
                     isActive: tradeInfo[0],
-                    fromAsset: tradeInfo[1],
-                    toAsset: tradeInfo[2],
-                    deposited: tradeInfo[3],
-                    depositedWithMargin: tradeInfo[4],
-                    firstPrice: tradeInfo[5],
-                    createdTimestamp: tradeInfo[6],
+                    isSuccessed: tradeInfo[1],
+                    fromAsset: tradeInfo[2],
+                    toAsset: tradeInfo[3],
+                    deposited: tradeInfo[4],
+                    depositedWithMargin: tradeInfo[5],
+                    firstPrice: tradeInfo[6],
+                    createdTimestamp: tradeInfo[7],
                     nftOwner: web3Account
                 }
 
@@ -87,12 +88,13 @@ const PositionCard: React.FC<{ className?: string, proposition: Proposition }> =
 
                 const formattedTradeInfo = {
                     isActive: tradeInfo[0],
-                    fromAsset: tradeInfo[1],
-                    toAsset: tradeInfo[2],
-                    deposited: tradeInfo[3],
-                    depositedWithMargin: tradeInfo[4],
-                    firstPrice: tradeInfo[5],
-                    createdTimestamp: tradeInfo[6],
+                    isSuccessed: tradeInfo[1],
+                    fromAsset: tradeInfo[2],
+                    toAsset: tradeInfo[3],
+                    deposited: tradeInfo[4],
+                    depositedWithMargin: tradeInfo[5],
+                    firstPrice: tradeInfo[6],
+                    createdTimestamp: tradeInfo[7],
                     nftOwner: web3Account
                 }
 
@@ -116,7 +118,7 @@ const PositionCard: React.FC<{ className?: string, proposition: Proposition }> =
     if (!web3)
         return <></>
 
-    return <Grid item xs={12} lg={4}>
+    return <Grid item xs={12} md={6}>
         <Card className={className} style={{borderRadius: 20, padding: 10, background: "#f1f7ff"}}>
             <Row2>
                 <Row>
@@ -151,8 +153,10 @@ const PositionCard: React.FC<{ className?: string, proposition: Proposition }> =
             </>
             }
             {proposition.tradeInfo && !proposition.tradeInfo.isActive && <>
-                <Button variant={"contained"} disabled={true} fullWidth={true} color={"error"} onClick={() => closePosition()}>
-                    Позиция закрыта
+                <Button variant={"contained"} disabled={true} fullWidth={true}
+                        color={proposition.tradeInfo.isSuccessed ? "secondary" : "error"}
+                        onClick={() => closePosition()}>
+                    Позиция закрыта - {proposition.tradeInfo.isSuccessed ? "выгодно!" : "не выгодно"}
                 </Button>
                 <Box height={10}/>
             </>

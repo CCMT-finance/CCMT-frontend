@@ -21,6 +21,7 @@ export type Proposition = {
     tradeInfo?: {
         nftOwner: string,
         isActive: boolean,
+        isSuccessed: boolean,
         fromAsset: string,
         toAsset: string,
         deposited: string,
