@@ -116,7 +116,7 @@ const PositionCard: React.FC<{ className?: string, proposition: Proposition }> =
     if (!web3)
         return <></>
 
-    return <Grid item xs={12} md={6} lg={4}>
+    return <Grid item xs={12} lg={4}>
         <Card className={className} style={{borderRadius: 20, padding: 10, background: "#f1f7ff"}}>
             <Row2>
                 <Row>
